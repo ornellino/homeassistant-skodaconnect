@@ -22,13 +22,13 @@ set_charge_limit:
       selector:
         number:
           min: 0
-          max: 50
+          max: 100
           step: 10
           unit_of_measurement: percent
 set_charger_max_current:
   name: Set charger max current
   description: >
-    Set the maximum current used for charger. Overrides the current setting in departure timers.
+    Set the maximum current used for charger. Global setting.
   fields:
     device_id:
       name: Vehicle
@@ -39,13 +39,14 @@ set_charger_max_current:
           integration: skodaconnect
     current:
       name: Current
-      description: Maximum current for charger
+      description: Maximum current for charger. 1-6(32?). 252 equals "Reduced" (6 Amps) and 254 equals "Maximum" (16 Amps+).
       advanced: true
+      example: 16
       selector:
-        select:
-          options:
-            - maximum
-            - reduced
+        number:
+          min: 1
+          max: 255
+          unit_of_measurement: Ampere
 set_pheater_duration:
   name: Set parking heater runtime
   description: >
@@ -62,6 +63,7 @@ set_pheater_duration:
       name: Runtime
       description: Runtime for heating or ventilation of the parking heater.
       advanced: true
+      example: 20
       selector:
         number:
           min: 10
