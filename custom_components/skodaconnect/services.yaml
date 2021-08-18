@@ -1,10 +1,11 @@
-# Describes the format for available Skoda Connect service calls
+# Describes the format for available light services
 
 set_charge_limit:
   name: Set charge limit
   description: >
     Set the limit that the charger will charge directly to when
     a departure timer is active.
+#  target:
   fields:
     device_id:
       name: Vehicle
@@ -131,65 +132,3 @@ set_departure_schedule:
       example: "yyynnnn"
       selector:
         text:
-    charging:
-      name: Charge
-      description:
-        If charging should be enabled for this schedule
-      advanced: true
-      example: true
-      default: true
-      selector:
-        boolean:
-    charge_current:
-      name: Charge current
-      description:
-        The maximum charge current for this schedule
-      advanced: "Maximum"
-      example: "Maximum"
-      default: "Maximum"
-      selector:
-        text:
-    charge_target:
-      name: Charge target
-      description: Target for battery charge %
-      advanced: true
-      example: 100
-      selector:
-        number:
-          min: 0
-          max: 100
-          mode: box
-    climatisation:
-      name: Climatisation
-      description:
-        If climatisation should be enabled for this schedule
-      advanced: true
-      example: true
-      default: true
-      selector:
-        boolean:
-    offpeakactive:
-      name: Off-peak active
-      description:
-        If off-peak is active
-      advanced: true
-      example: true
-      default: true
-      selector:
-        boolean:
-    offpeakstart:
-      name: Low cost period start
-      description:
-        The time when off-peak electric price starts
-      advanced: true
-      example: "20:00"
-      selector:
-        time:
-    offpeakend:
-      name: Low cost period end
-      description:
-        The time when off-peak electric price ends
-      advanced: true
-      example: "06:00"
-      selector:
-        time:
