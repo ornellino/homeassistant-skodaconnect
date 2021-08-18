@@ -12,7 +12,6 @@ import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry, SOURCE_REAUTH
 from homeassistant.const import (
-    CONF_NAME,
     CONF_PASSWORD,
     CONF_RESOURCES,
     CONF_USERNAME, EVENT_HOMEASSISTANT_STOP,
@@ -79,17 +78,17 @@ SERVICE_SET_PHEATER_DURATION_SCHEMA = vol.Schema(
     }
 )
 
-
-
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Setup Skoda Connect component"""
-    hass.data.setdefault(DOMAIN, {})
 
-    if entry.options.get(CONF_UPDATE_INTERVAL):
+    # Set update interval from options if available, else from data
+    if entry.options.get(CONF_UPDATE_INTERVAL, False):
         update_interval = timedelta(minutes=entry.options[CONF_UPDATE_INTERVAL])
+    elif entry.data.get(CONF_UPDATE_INTERVAL, False):
+        update_interval = timedelta(minutes=entry.data[CONF_UPDATE_INTERVAL])
     else:
         update_interval = timedelta(minutes=DEFAULT_UPDATE_INTERVAL)
 
@@ -251,15 +250,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         schema = SERVICE_SET_PHEATER_DURATION_SCHEMA
     )
 
-     return True
+    return True
 
 
 def update_callback(hass, coordinator):
-    _LOGGER.debug("CALLBACK!")
     hass.async_create_task(
         coordinator.async_request_refresh()
     )
-
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the component."""
@@ -315,7 +312,6 @@ class SkodaData:
         self.vehicles = set()
         self.instruments = set()
         self.config = config.get(DOMAIN, config)
-        self.names = self.config.get(CONF_NAME, None)
         self.coordinator = coordinator
 
     def instrument(self, vin, component, attr):
@@ -337,24 +333,14 @@ class SkodaData:
 
     def vehicle_name(self, vehicle):
         """Provide a friendly name for a vehicle."""
-        try:
-            # Return name if already configured
-            if isinstance(self.names, str):
-                if len(self.names) > 0:
-                    return self.names
-
-            # Check if name already exists for VIN
-            if vehicle.vin and vehicle.vin.lower() in self.names:
-                return self.names[vehicle.vin.lower()]
-        except:
-            pass
-
-        # Default name to nickname if supported, else vin number
+        # Default name to nickname if supported and set, else set to vin
         try:
             if vehicle.is_nickname_supported:
-                return vehicle.nickname
-            elif vehicle.vin:
-                return vehicle.vin
+                if len(vehicle.nickname) > 0:
+                    return vehicle.nickname
+            else:
+                if vehicle.vin:
+                    return vehicle.vin
         except:
             _LOGGER.info(f"Name set to blank")
             return ""
@@ -369,7 +355,6 @@ class SkodaEntity(Entity):
         def update_callbacks():
             if callback is not None:
                 callback(self.hass, data.coordinator)
-
         self.data = data
         self.vin = vin
         self.component = component
@@ -496,7 +481,7 @@ class SkodaCoordinator(DataUpdateCoordinator):
             session=async_get_clientsession(hass),
             username=self.entry.data[CONF_USERNAME],
             password=self.entry.data[CONF_PASSWORD],
-            fulldebug=self.entry.options.get(CONF_DEBUG, self.entry.data.get(CONF_DEBUG, DEFAULT_DEBUG)),
+            fulldebug=self.entry.options.get(CONF_DEBUG, DEFAULT_DEBUG),
         )
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=update_interval)
@@ -520,8 +505,8 @@ class SkodaCoordinator(DataUpdateCoordinator):
         )
 
         dashboard = vehicle.dashboard(
-            mutable=self.entry.data.get(CONF_MUTABLE),
-            spin=self.entry.data.get(CONF_SPIN),
+            mutable=self.entry.options.get(CONF_MUTABLE, self.entry.data.get(CONF_MUTABLE, True)),
+            spin=self.entry.options.get(CONF_SPIN, self.entry.data.get(CONF_SPIN, None)),
             miles=convert_conf == CONF_IMPERIAL_UNITS,
             scandinavian_miles=convert_conf == CONF_SCANDINAVIAN_MILES,
         )
@@ -565,3 +550,4 @@ class SkodaCoordinator(DataUpdateCoordinator):
                 return vehicle
 
         return False
+

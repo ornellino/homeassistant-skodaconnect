@@ -12,6 +12,7 @@ CONF_IMPERIAL_UNITS = "imperial_units"
 CONF_NO_CONVERSION = None
 CONF_CONVERT = "convert"
 CONF_VEHICLE = "vehicle"
+CONF_VEHICLES_SELECTED = "vehicles"
 CONF_UPDATE_INTERVAL = "update_interval"
 CONF_DEBUG = "debug"
 

@@ -126,6 +126,7 @@ class SkodaConnectConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(self._init_info[CONF_VEHICLE])
             self._abort_if_unique_id_configured()
 
+            _LOGGER.info(f"Creating entry with config {self._init_info}")
             return self.async_create_entry(
                 title=self._init_info[CONF_VEHICLE], data=self._init_info
             )
@@ -256,6 +257,9 @@ class SkodaConnectOptionsFlowHandler(config_entries.OptionsFlow):
 
         # Backward compatibility
         default_convert_conf = get_convert_conf(self._config_entry)
+        _LOGGER.info(f"Config entry options: {self._config_entry.options}")
+        _LOGGER.info(f"Config entry data: {self._config_entry.data}")
+        _LOGGER.info(f"Config entry yaml: {default_convert_conf}")
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
@@ -279,6 +283,14 @@ class SkodaConnectOptionsFlowHandler(config_entries.OptionsFlow):
                         default=self._config_entry.options.get(
                             CONF_DEBUG, self._config_entry.data.get(
                                 CONF_DEBUG, DEFAULT_DEBUG
+                            )
+                        )
+                    ): cv.boolean,
+                    vol.Optional(
+                        CONF_MUTABLE,
+                        default=self._config_entry.options.get(
+                            CONF_MUTABLE, self._config_entry.data.get(
+                                CONF_MUTABLE, True
                             )
                         )
                     ): cv.boolean,

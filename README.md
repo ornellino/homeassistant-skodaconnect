@@ -4,7 +4,7 @@
 
 # Skoda Connect - A Home Assistant custom component for Skoda Connect/MyŠKODA
 
-# v1.0.42-RC1
+# v1.0.42-RC3
 **WARNING!**
 This is a BETA pre-release. Only install if you are having issues with latest stable release. Read release notes for more details.
 Starting from this release the configuration changed from yaml to config flow. Because of how the data is stored and handled there will be one integration per vehicle.
@@ -49,6 +49,8 @@ This release adds beta functionality for newer EV's such as Enyaq iV. Supported 
 - Plug connected
 - Plug locked
 - Charger connected (external power)
+- Charge rate (km per hour)
+- Charging power in Watt
 
 This release adds beta functionality for SmartLink cars. Supported sensors:
 - Fuel level
@@ -153,6 +155,8 @@ If not specified then the integration will add all supported entities:
     - battery_level
     - charger_max_ampere
     - charging_time_left
+    - charge_rate
+    - charging_power
     - climatisation_target_temperature
     - combined_range
     - combustion_range
@@ -320,3 +324,7 @@ logger:
 * **custom_components.skodaconnect.XYZ** Sets debug level for individual entity types in the custom component.
 
 In addition to debug logs, the component has an option to enable logging of raw HTTP responses which is useful when debugging issues. See 'response_debug' [here](https://github.com/lendy007/homeassistant-skodaconnect/blob/main/README.md#advanced-configuration)
+
+
+## Further help or contributions
+For questions, further help or contributions you can join the Discord server at https://discord.gg/826X9jEtCh
